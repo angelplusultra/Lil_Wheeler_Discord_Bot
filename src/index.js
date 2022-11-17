@@ -119,8 +119,12 @@ async function main() {
 
   // Updating the Guild Commands with My Bots Custom Commands
   try {
+    // log(`\n🛡 Refreshing Guild Application (/) Commands 🛡`.blue);
+    // await rest.put(Routes.applicationGuildCommands(CLIENT_ID, GUILD_ID), {
+    //   body: commands,
+    // });
     log(`\n🔃 Refreshing Application (/) Commands 🔃`.blue);
-    await rest.put(Routes.applicationGuildCommands(CLIENT_ID, GUILD_ID), {
+    await rest.put(Routes.applicationCommands(CLIENT_ID), {
       body: commands,
     });
     client.login(TOKEN);
