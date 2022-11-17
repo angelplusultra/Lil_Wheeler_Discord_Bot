@@ -126,10 +126,10 @@ async function main() {
     });
 
     // GLOBAL COMMAND REFRESH (ONLY UNCOMMENT WHEN ABOUT TO DEPLOY)
-    // log(`\n🔃 Refreshing Application (/) Commands 🔃`.blue);
-    // await rest.put(Routes.applicationCommands(CLIENT_ID), {
-    //   body: commands,
-    // });
+    log(`\n🔃 Refreshing Application (/) Commands 🔃`.blue);
+    await rest.put(Routes.applicationCommands(CLIENT_ID), {
+      body: commands,
+    });
     client.login(TOKEN);
   } catch (error) {
     console.log(error);
