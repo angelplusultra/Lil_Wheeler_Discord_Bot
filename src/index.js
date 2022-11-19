@@ -1,27 +1,26 @@
 // **IMPORTS**
-import { Client, Routes } from "discord.js";
+import {
+  Client,
+  Routes,
+} from "discord.js";
 import * as path from "path";
 import { config } from "dotenv";
 import botControllers from "./controllers/botcontrollers.js";
 import connectDB from "./config/db.js";
 import { REST } from "@discordjs/rest";
 import colors from "colors";
-
 // COMMAND IMPORTS
-import GetMovieCommand from "./commands/getmovie.js";
-import { AddMovieCommand } from "./commands/addmovie.js";
-import DeleteMovieCommand from "./commands/deletemovie.js";
-import GetFiveMoviesCommand from './commands/getfivemovies.js'
-import SearchMovieCommand from "./commands/searchmovie.js";
-import UpdateLinkCommand from "./commands/updatelink.js";
-import UpdateTitleCommand from "./commands/updatetitle.js";
-
-
-
+import SlashCommands from "./commands/slashcommands.js";
 
 // **CONSOLE.LOG SHORTHAND**
 const log = console.log;
-
+log(
+  `\n Application is in ${
+    process.env.NODE_ENV === "development"
+      ? "development".red
+      : "production".green
+  } mode`
+);
 // **ENV CONFIG**
 config({ path: path.join(path.resolve() + "/src/config/.env") });
 
@@ -42,94 +41,81 @@ const rest = new REST({ version: 10 }).setToken(TOKEN);
 
 // Bot on Succesful Connection
 client.on("ready", () => {
-  log(`\n🤖 ${client.user.username} is logged in 🤖 `.trap.magenta);
+  log(`\n🤖 ${client.user.username} is logged in`.trap.magenta);
+  
 });
 
 // Slash Command Handlers
 client.on("interactionCreate", (interaction) => {
-  if (interaction.commandName === "addmovie") {
-    botControllers.addMovie(interaction);
+  if (interaction.isChatInputCommand()) {
+
+    if (interaction.commandName === 'movieemporium') {
+      if (interaction.options.getSubcommand() === 'getmovie') {
+          botControllers.getMovie(interaction);
+      }
+      if (interaction.options.getSubcommand() === 'addmovie'){
+          botControllers.addMovie(interaction);
+      }
+      if (interaction.options.getSubcommand() === 'deletemovie'){
+        botControllers.deleteMovie(interaction);
+      }
+      if (interaction.options.getSubcommand() === 'getfivemovies'){
+        botControllers.getFive(interaction);
+      }
+      if (interaction.options.getSubcommand() === 'searchmovie'){
+          botControllers.searchMovie(interaction);
+      }
+      if (interaction.options.getSubcommand() === 'updatemovietitle'){
+          botControllers.updateTitle(interaction);
+      }
+      if (interaction.options.getSubcommand() === 'updatemovielink'){
+          botControllers.updateLink(interaction);
+      }
   }
-  if (interaction.commandName === "deletemovie") {
-    botControllers.deleteMovie(interaction);
-  }
 
-  if (interaction.commandName === "getmovie")
-    botControllers.getMovie(interaction);
 
-  if (interaction.commandName === "getfivemovies")
-    botControllers.getFive(interaction);
-    if(interaction.commandName === 'searchmovie'){
-      botControllers.searchMovie(interaction)
-    }
-  if (interaction.commandName === "enroll") {
-    const firstName = interaction.options.get("firstname").value;
-    const lastName = interaction.options.get("lastname").value;
 
-    interaction.reply({
-      content: `hey there ${firstName} ${lastName}, you have enrolled in Banana Academy!`,
-    });
-    console.log(interaction.options.getString("food"));
+
+    
+  } else if (interaction.isSelectMenu()){
+      if (interaction.customId === 'food_options'){
+
+        
+
+      }
+    
+    interaction.reply({content: "it works"})
   }
 });
 
-// Slash Commands Registration
+// **SLASH COMMANDS REGISTRATION**
 async function main() {
-  // **Commands Array**
-  // const commands = [
-  //   {
-  //     name: "order",
-  //     description: "Order something...",
-  //     options: [
-  //       {
-  //         name: "food",
-  //         description: "type of food",
-  //         type: 3,
-  //         required: true,
-  //         choices: [
-  //           { name: "Cake", value: "cake" },
-  //           { name: "Hamburger", value: "hamburger" },
-  //         ],
-  //       },
-  //       {
-  //         name: "drink",
-  //         description: "Choose a drink",
-  //         type: 3,
-  //         required: true,
-  //         choices: [
-  //           { name: "Dr. Pepper", value: "drpepper" },
-  //           { name: "Sprite", value: "sprite" },
-  //         ],
-  //       },
-  //     ],
-  //   }
-  // ];
-
-  // **Slash Command Builder**
-
+  // **POPULATING AN ARRAY OF SLASH COMMANDS CONVERTED INTO JSON OBJECTS**
   const commands = [
-    AddMovieCommand,
-    DeleteMovieCommand,
-    GetMovieCommand,
-    GetFiveMoviesCommand,
-    UpdateLinkCommand,
-    UpdateTitleCommand,
-    SearchMovieCommand
+    SlashCommands.LilWheelersMovieEmporium.toJSON()
   ];
 
-  // Updating the Guild Commands with My Bots Custom Commands
   try {
     // **TEST SERVER COMMAND REFRESH**
-    log(`\n🛡 Refreshing Guild Application (/) Commands 🛡`.blue);
-    await rest.put(Routes.applicationGuildCommands(CLIENT_ID, GUILD_ID), {
-      body: commands,
-    });
 
-    // GLOBAL COMMAND REFRESH (ONLY UNCOMMENT WHEN ABOUT TO DEPLOY)
-    log(`\n🔃 Refreshing Application (/) Commands 🔃`.blue);
-    await rest.put(Routes.applicationCommands(CLIENT_ID), {
-      body: commands,
-    });
+    if (process.env.NODE_ENV === "development") {
+      // Updating the Guild Commands with My Bots Custom Commands
+      log(
+        `\n🧪 Refreshing ${colors.bold.underline(
+          "Test"
+        )} Application (/) Commands`.blue
+      );
+       await rest.put(Routes.applicationGuildCommands(CLIENT_ID, GUILD_ID), {
+        body: commands,
+      });
+    } else {
+      // GLOBAL COMMAND REFRESH (ONLY UNCOMMENT WHEN ABOUT TO DEPLOY)
+      log(`\n🔃 Refreshing Application (/) Commands`.blue);
+      await rest.put(Routes.applicationCommands(CLIENT_ID), {
+        body: commands,
+      });
+    }
+
     client.login(TOKEN);
   } catch (error) {
     console.log(error);
@@ -137,3 +123,6 @@ async function main() {
 }
 
 main();
+
+
+
