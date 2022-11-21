@@ -1,8 +1,10 @@
 import mongoose from 'mongoose'
 
 const movieSchema = new mongoose.Schema({
-    title: {type: String, unique: true, require: true},
-    link: {type: String, unique: true, sparse: true}
+    title: {type: String, require: true},
+    link: {type: String, sparse: true},
+    ratings : [{userID: Number, watchedOn: Date, rating: String, review: String}],
+    serverID: {type: Number, require: true}
   });
 
 export default mongoose.model('Movie', movieSchema);

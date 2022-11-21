@@ -49,6 +49,8 @@ client.on("ready", () => {
 client.on("interactionCreate", (interaction) => {
   if (interaction.isChatInputCommand()) {
 
+    
+      // **MOVIE EMPORIUM ROUTES**
     if (interaction.commandName === 'movieemporium') {
       if (interaction.options.getSubcommand() === 'getmovie') {
           botControllers.getMovie(interaction);
@@ -71,16 +73,15 @@ client.on("interactionCreate", (interaction) => {
       if (interaction.options.getSubcommand() === 'updatemovielink'){
           botControllers.updateLink(interaction);
       }
+      if (interaction.options.getSubcommand() === 'reviewmovie') {
+          botControllers.reviewMovie(interaction);
+          
+          
+      }
   }
-
-
-
-
     
   } else if (interaction.isSelectMenu()){
       if (interaction.customId === 'food_options'){
-
-        
 
       }
     
