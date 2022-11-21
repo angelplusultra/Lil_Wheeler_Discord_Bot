@@ -15,6 +15,7 @@ const botControllers = {
     const title = titleCase(interaction.options.get("title").value);
     const link = interaction.options.get("link").value;
     const rating = interaction.options.getString("rate");
+    const review = interaction.options.getString("review")
     const userID = +interaction.user.id
     const serverID = +interaction.guildId
     
@@ -23,8 +24,8 @@ try {
   if(!movie){
     if (validURL.isUri(link)) {
       
-        const newMovie = new Movie({ title, link, ratings: !rating ?  [] : [{userID, rating}], serverID });
-        console.log(`New movie saved without rating: ${newMovie}`)
+        const newMovie = new Movie({ title, link, ratings:  !review && !rating ? [] : !rating ? [{userID, review}] : !review ? [{userID, rating}] : [{userID, rating, review}] , serverID });
+        console.log(newMovie)
         await newMovie.save();
         const res = await axios.get(
           `https://www.omdbapi.com/?t=${title.split(' ').join('_')}&apikey=272fc884`
@@ -39,7 +40,7 @@ try {
         } = res.data;
 
   
-        const movieEmbed = embeds.AddMovieEmbed(rating, interaction, title, res, year, director, language, runtime, link)
+        const movieEmbed = embeds.AddMovieEmbed(rating, interaction, title, res, year, director, language, runtime, link, review)
   
         interaction.reply({ content: `${title} has been saved to the DB!`, embeds: [movieEmbed] });
 
@@ -186,6 +187,8 @@ try {
       possibleMatches.forEach(async (movie) => {
 
         const userRatings = movie.ratings.filter(el => el.userID === userID)
+        const userLatestReview = userRatings[userRatings.length - 1]
+        console.log(typeof userLatestReview?.watchedOn === "undefined")
         const res = await axios.get(
           `https://www.omdbapi.com/?t=${movie.title}&apikey=272fc884`
         );
@@ -197,24 +200,9 @@ try {
           Metascore: metascore,
           imdbRating,
         } = res.data;  
-        const movieEmbed = new EmbedBuilder()
-        .setThumbnail( userRatings.length === 0 ? null : userRatings[0].rating.length >= 4 ? "https://i.imgur.com/pIfdoIW.gif" : null
-          
-        )
-        .setColor(userRatings.length === 0 ? 0x20124d : userRatings[0].rating.length >= 4 ? 0xd4af37 : 0x20124d)
-        .setTitle( movie.title
-        )
-        .setDescription(res.data.Plot || "N/A")
-        .setImage(res.data.Poster || null)
-        .addFields(
-          { name: "Year", value: year || "N/A", inline: true },
-          { name: "Director", value: director || "N/A", inline: true },
-          { name: "Language", value: language || "N/A", inline: true },
-          { name: "Runtime", value: runtime || "N/A", inline: true },
-          {name: `${interaction.user.username}'s Rating`, value: userRatings.length > 0 ? userRatings[0].rating : "N/A", inline: true},
-          // {name: `${interaction.user.username}'s Review`, value: userReview || "N/A", inline: true}
-        )
-        .setURL(movie.link || null)
+
+        
+        const movieEmbed = embeds.SearchMovieEmbed(movie, userRatings, userLatestReview, interaction, res, year, director, language, runtime)
     
 
         embedsArray.push(movieEmbed)
