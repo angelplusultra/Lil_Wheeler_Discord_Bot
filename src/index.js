@@ -14,16 +14,13 @@ import SlashCommands from "./commands/slashcommands.js";
 
 // **CONSOLE.LOG SHORTHAND**
 const log = console.log;
-log(
-  `\n Application is in ${
-    process.env.NODE_ENV === "development"
-      ? "development".red
-      : "production".green
-  } mode`
-);
+
+log(`\n Application is in ${process.env.NODE_ENV === "development" ? "development".red : "production".green} mode`);
+
 // **ENV CONFIG**
 config({ path: path.join(path.resolve() + "/src/config/.env") });
 
+// Mongo Connection
 connectDB();
 
 // **TOKENS**
@@ -52,17 +49,18 @@ client.on("interactionCreate", (interaction) => {
     
       // **MOVIE EMPORIUM ROUTES**
     if (interaction.commandName === 'movieemporium') {
-      if (interaction.options.getSubcommand() === 'getmovie') {
+        const commandName = interaction.options.getSubcommand()
+      if (commandName === 'getmovie') {
           botControllers.getMovie(interaction);
       }
       if (interaction.options.getSubcommand() === 'addmovie'){
           botControllers.addMovie(interaction);
       }
       if (interaction.options.getSubcommand() === 'deletemovie'){
-        botControllers.deleteMovie(interaction);
+          botControllers.deleteMovie(interaction);
       }
       if (interaction.options.getSubcommand() === 'getfivemovies'){
-        botControllers.getFive(interaction);
+          botControllers.getFive(interaction);
       }
       if (interaction.options.getSubcommand() === 'searchmovie'){
           botControllers.searchMovie(interaction);

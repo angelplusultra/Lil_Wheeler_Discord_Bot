@@ -47,6 +47,31 @@ const embeds = {
       .setURL(movie.link || null)
   
 
+},
+
+GetRandomMovieEmbed: function(title, userRatings, userLatestReview, interaction,  res, year, director, language, runtime, link){
+  return new EmbedBuilder()
+  .setThumbnail( typeof userLatestReview?.rating === 'undefined' ? null : userLatestReview.rating.length >= 4 ? "https://i.imgur.com/pIfdoIW.gif" : null
+    
+  )
+  .setColor(typeof userLatestReview?.rating === 'undefined' ? 0x20124d : userLatestReview.rating.length >= 4 ? 0xd4af37 : 0x20124d )
+  .setTitle( title
+  )
+  .setDescription(res.data.Plot || "N/A")
+  .setImage(res.data.Poster || null)
+  .addFields(
+    { name: "Year", value: year || "N/A", inline: true },
+    { name: "Director", value: director || "N/A", inline: true },
+    { name: "Language", value: language || "N/A", inline: true },
+    { name: "Runtime", value: runtime || "N/A", inline: true },
+    {name: `${interaction.user.username}'s Rating`, value: typeof userLatestReview?.rating === 'undefined' ? "N/A" : userLatestReview.rating , inline: true},
+    {name: `${interaction.user.username}'s Review`, value: typeof userLatestReview?.review === 'undefined' ? "N/A" : userLatestReview.review, inline: true}
+  
+  
+  )
+  .setURL(link || null)
+
+
 }
 
     }

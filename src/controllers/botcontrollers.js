@@ -45,7 +45,12 @@ try {
         interaction.reply({ content: `${title} has been saved to the DB!`, embeds: [movieEmbed] });
 
     } else{
-      interaction.reply(`Sorry, the link you entered is not a valid URL`)
+
+      const embed = new EmbedBuilder()
+      .setTitle('Error: Invalid URL')
+      .setDescription('Sorry, the URL entered is invalid')
+      
+      interaction.reply({embeds: [embed] })
     }
   } else{
     interaction.reply(`${title} already exists in the DB!`)
@@ -76,27 +81,30 @@ try {
     }
   },
   getMovie: async function (interaction) {
+    const userID = +interaction.user.id
+    const serverID = interaction.guildId
     try {
-      const movies = await Movie.find();
-      const { title, link } = movies[Math.floor(Math.random() * movies.length)];
+      const movies = await Movie.find({serverID: serverID});
+      const randomSelection = movies[Math.floor(Math.random() * movies.length)];
+      const {title, link } = randomSelection
+      const userRatings = randomSelection.ratings.filter(el => el.userID === userID)
+      const userLatestReview = userRatings[userRatings.length - 1]
+      console.log(randomSelection, userRatings);
       const res = await axios.get(
         `https://www.omdbapi.com/?t=${title
           .split(" ")
           .join("_")}&apikey=272fc884`
       );
-      console.log(res.data);
-      const movieEmbed = new EmbedBuilder()
-        .setColor(0x20124d)
-        .setTitle(title || "N/A")
-        .setDescription(res.data.Plot || "N/A")
-        .setImage(res.data.Poster || null)
-        .addFields(
-          { name: "Year", value: res.data.Year || "N/A", inline: true },
-          { name: "Director", value: res.data.Director || "N/A", inline: true },
-          { name: "Language", value: res.data.Language || "N/A", inline: true },
-          { name: "Runtime", value: res.data.Runtime || "N/A", inline: true }
-        )
-        .setURL(link || null);
+      
+      const {
+        Year: year,
+        Director: director,
+        Language: language,
+        Runtime: runtime,
+        Metascore: metascore,
+        imdbRating,
+      } = res.data;
+     const movieEmbed = embeds.GetRandomMovieEmbed(title, userRatings, userLatestReview, interaction, res, year, director, language, runtime, link)
 
       interaction.reply({ embeds: [movieEmbed] });
     } catch (error) {
@@ -188,7 +196,6 @@ try {
 
         const userRatings = movie.ratings.filter(el => el.userID === userID)
         const userLatestReview = userRatings[userRatings.length - 1]
-        console.log(typeof userLatestReview?.watchedOn === "undefined")
         const res = await axios.get(
           `https://www.omdbapi.com/?t=${movie.title}&apikey=272fc884`
         );
@@ -319,7 +326,6 @@ try {
           { name: "Director", value: director || "N/A", inline: true },
           { name: "Language", value: language || "N/A", inline: true },
           { name: "Runtime", value: runtime || "N/A", inline: true },
-          {name: 'Watched on', value: moment.tz(movie.watchedOn, 'America/Los_Angeles').format('MMMM Do YYYY'), inline: true},
           {name: `${interaction.user.username}'s Rating`, value: userRating, inline: true},
           {name: `${interaction.user.username}'s Review`, value: userReview || "N/A", inline: true}
         )
