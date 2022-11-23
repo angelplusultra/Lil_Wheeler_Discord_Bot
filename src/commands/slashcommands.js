@@ -1,4 +1,8 @@
 import { SlashCommandBuilder } from "discord.js";
+import moment from 'moment-timezone'
+
+const currentYear = +moment().format('YYYY');  
+
 
 const botCommands = {
     LilWheelersMovieEmporium: new SlashCommandBuilder()
@@ -10,7 +14,7 @@ const botCommands = {
     .setName('title')
     .setDescription('Pleas enter the title of the movie')
     .setRequired(true))
-    .addStringOption(option => option.setName('year').setDescription('Please enter the release year of the movie').setRequired(true))
+    .addIntegerOption(option => option.setName('year').setDescription('Please enter the release year of the movie').setRequired(true).setMinValue(1888).setMaxValue(currentYear))
     .addStringOption(option => option.setName('link').setDescription('Please enter the link to the movie').setRequired(true))
     .addStringOption(option => option.setName('rate').setDescription('rate the movie out of 5 stars').addChoices({name: '⭐', value: '⭐' }, {name: '⭐⭐', value: '⭐⭐' }, {name: '⭐⭐⭐', value: '⭐⭐⭐' },{name: '⭐⭐⭐⭐', value: '⭐⭐⭐⭐' }, {name: '⭐⭐⭐⭐⭐', value: '⭐⭐⭐⭐⭐' } )).addStringOption(option => 
         option.setName('review').setDescription('Please enter a review for the movie')))
@@ -19,8 +23,8 @@ const botCommands = {
     .addStringOption(option => option
     .setName('title')
     .setDescription('Pleas enter the title of the movie')
-    .setRequired(true)
-    ))
+    .setRequired(true) )
+    .addIntegerOption(option => option.setName('year').setDescription('Please enter the release year of the movie').setRequired(true).setMinValue(1888).setMaxValue(currentYear)))
     // **GET MOVIE**
     .addSubcommand(subcommand => subcommand.setName('getmovie').setDescription('Get a random movie recommendation from the DB'))
     // **GET FIVE MOVIES**
@@ -34,16 +38,19 @@ const botCommands = {
     .addSubcommand(subcommand => subcommand.setName('updatemovielink')
     .setDescription('Update the download/stream link of a movie in the DB')
     .addStringOption(option => option.setName('title').setRequired(true).setDescription('Please enter title of the movie you wish to modify'))
+    .addIntegerOption(option => option.setName('year').setDescription('Please enter the release year of the movie').setRequired(true).setMinValue(1888).setMaxValue(currentYear))
     .addStringOption(option => option.setName('newlink').setRequired(true).setDescription('Plase enter the new link')))
      // **UPDATE MOVIE LINK**   
     .addSubcommand(subcommand => subcommand.setName('updatemovietitle')
     .setDescription('Update the title of a movie in the DB')
     .addStringOption(option => option.setName('title').setRequired(true).setDescription('Please enter the current title of the movie you want to change'))
+    .addIntegerOption(option => option.setName('year').setDescription('Please enter the release year of the movie').setRequired(true).setMinValue(1888).setMaxValue(currentYear))
     .addStringOption(option => option.setName('newtitle').setRequired(true).setDescription('Plase enter the new title')))
 
 
     .addSubcommand(subcommand => subcommand.setName('reviewmovie').setDescription('Rate/Review a movie')
     .addStringOption(option => option.setName('title').setDescription('Which movie in the DB would you like to review?').setRequired(true))
+    .addIntegerOption(option => option.setName('year').setDescription('Please enter the release year of the movie').setRequired(true).setMinValue(1888).setMaxValue(currentYear))
     .addStringOption(option => option.setName('rating').setDescription('Choose a rating')
     .addChoices({name: '⭐', value: '⭐' }, {name: '⭐⭐', value: '⭐⭐' }, {name: '⭐⭐⭐', value: '⭐⭐⭐' },{name: '⭐⭐⭐⭐', value: '⭐⭐⭐⭐' }, {name: '⭐⭐⭐⭐⭐', value: '⭐⭐⭐⭐⭐' } ).setRequired(true))
     .addStringOption(option => option.setName('review').setDescription('Write a review for the film').setMaxLength(1024)))

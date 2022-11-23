@@ -17,7 +17,7 @@ const botControllers = {
     const link = interaction.options.get("link").value;
     const rating = interaction.options.getString("rate");
     const review = interaction.options.getString("review")
-    const releaseYear = +interaction.options.getString("year")
+    const releaseYear = interaction.options.getInteger("year")
     const userID = +interaction.user.id
     const serverID = +interaction.guildId
     
@@ -71,7 +71,7 @@ try {
     const title = titleCase(interaction.options.get("title").value);
     const serverID = interaction.guildId
     try {
-      const result = await Movie.findOneAndDelete({ title: title, serverID: serverID  });
+      const result = await Movie.findOneAndDelete({ title: title, serverID: serverID, releaseYear  });
       interaction.reply({
         content: `${title} ${
           !result ? "was not found in" : "was deleted from"
@@ -122,6 +122,7 @@ try {
   },
   getFive: async function (interaction) {
     const serverID = interaction.guildId
+    const userID = interaction.user.id
     try {
       const movies = await Movie.find({serverID});
       let movieArray = [];
@@ -137,7 +138,7 @@ try {
           const userRatings = randomSelection.ratings.filter(el => el.userID === userID)
           const userLatestReview = userRatings[userRatings.length - 1]
           
-          const res = await axios.get(`https://www.omdbapi.com/?t=${title.split(" ").join("_")}&apikey=272fc884`);
+          const res = await axios.get(`https://www.omdbapi.com/?t=${title.split(" ").join("_")}&y=${randomSelection.releaseYear}&apikey=272fc884`);
           const {
             Year: year,
             Director: director,
@@ -154,10 +155,11 @@ try {
 
           // interaction.channel.send({ embeds: [movieEmbed] });
 
-          if (movieArray.length < 5) {
-            return;
-          } else {
+          if (movieArray.length === 5) {
             interaction.reply({ embeds: movieArray });
+            console.log(movieArray.length)
+          } else {
+            return;
           }
         });
     } catch (error) {

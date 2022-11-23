@@ -57,7 +57,7 @@ StandardMovieEmbed: function(title, userLatestReview, interaction,  plot, poster
   .setTitle( title
   )
   .setDescription(plot || "N/A")
-  .setImage(poster || null)
+  .setImage(poster === "N/A" ?  null : poster)
   .addFields(
     { name: "Year", value: year || "N/A", inline: true },
     { name: "Director", value: director || "N/A", inline: true },

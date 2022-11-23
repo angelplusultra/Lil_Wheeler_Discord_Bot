@@ -105,7 +105,7 @@ async function main() {
         )} Application (/) Commands`.blue
       );
        await rest.put(Routes.applicationGuildCommands(CLIENT_ID, GUILD_ID), {
-        body: commands,
+        body: [],
       });
     } else {
       // GLOBAL COMMAND REFRESH (ONLY UNCOMMENT WHEN ABOUT TO DEPLOY)
