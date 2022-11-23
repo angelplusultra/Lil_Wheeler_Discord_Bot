@@ -1,5 +1,4 @@
 import { EmbedBuilder } from "@discordjs/builders";
-import moment from 'moment-timezone'
 
 const embeds = {
     AddMovieEmbed: function(rating, interaction, title, res, year, director, language, runtime, link, review){
@@ -49,7 +48,7 @@ const embeds = {
 
 },
 
-GetRandomMovieEmbed: function(title, userRatings, userLatestReview, interaction,  res, year, director, language, runtime, link){
+StandardMovieEmbed: function(title, userLatestReview, interaction,  plot, poster, year, director, language, runtime, link){
   return new EmbedBuilder()
   .setThumbnail( typeof userLatestReview?.rating === 'undefined' ? null : userLatestReview.rating.length >= 4 ? "https://i.imgur.com/pIfdoIW.gif" : null
     
@@ -57,8 +56,8 @@ GetRandomMovieEmbed: function(title, userRatings, userLatestReview, interaction,
   .setColor(typeof userLatestReview?.rating === 'undefined' ? 0x20124d : userLatestReview.rating.length >= 4 ? 0xd4af37 : 0x20124d )
   .setTitle( title
   )
-  .setDescription(res.data.Plot || "N/A")
-  .setImage(res.data.Poster || null)
+  .setDescription(plot || "N/A")
+  .setImage(poster || null)
   .addFields(
     { name: "Year", value: year || "N/A", inline: true },
     { name: "Director", value: director || "N/A", inline: true },

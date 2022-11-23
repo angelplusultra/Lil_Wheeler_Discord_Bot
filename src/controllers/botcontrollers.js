@@ -1,14 +1,15 @@
 import { titleCase } from "title-case";
-import Movie from "../models/Movie.js";
-import { EmbedBuilder } from "discord.js";
+import { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle  } from "discord.js";
 import axios from "axios";
 import validURL from "valid-url";
-import moment from 'moment-timezone'
 import embeds from "../embeds/embeds.js";
+import models from "../models/models.js";
 
-
+// Model Deconstruction
+const {Movie, User} = models
 
 // DEV NOTE: MAKE SURE TO IMPLEMENT THE LATEST MOVIE EMBED FOR ALL MOVIE RETRIEVAL CONTROLLERS
+
 
 const botControllers = {
   addMovie: async function (interaction) {
@@ -16,19 +17,20 @@ const botControllers = {
     const link = interaction.options.get("link").value;
     const rating = interaction.options.getString("rate");
     const review = interaction.options.getString("review")
+    const releaseYear = +interaction.options.getString("year")
     const userID = +interaction.user.id
     const serverID = +interaction.guildId
     
 try {
-  const movie = await Movie.findOne({title, serverID})
-  if(!movie){
+  const movies = await Movie.find({title, serverID, releaseYear})
+  if(movies.length === 0){
     if (validURL.isUri(link)) {
       
-        const newMovie = new Movie({ title, link, ratings:  !review && !rating ? [] : !rating ? [{userID, review}] : !review ? [{userID, rating}] : [{userID, rating, review}] , serverID });
+        const newMovie = new Movie({ title, link, ratings:  !review && !rating ? [] : !rating ? [{userID, review}] : !review ? [{userID, rating}] : [{userID, rating, review}] , serverID, releaseYear  });
         console.log(newMovie)
         await newMovie.save();
         const res = await axios.get(
-          `https://www.omdbapi.com/?t=${title.split(' ').join('_')}&apikey=272fc884`
+          `https://www.omdbapi.com/?t=${title.split(' ').join('_')}&y=${releaseYear}&apikey=272fc884`
         );
         const {
           Year: year,
@@ -53,7 +55,8 @@ try {
       interaction.reply({embeds: [embed] })
     }
   } else{
-    interaction.reply(`${title} already exists in the DB!`)
+    
+    interaction.reply({ content: `${title} already exists in the DB!` })
   }
 } catch (error) {
   console.log(error)
@@ -66,8 +69,9 @@ try {
   },
   deleteMovie: async function (interaction) {
     const title = titleCase(interaction.options.get("title").value);
+    const serverID = interaction.guildId
     try {
-      const result = await Movie.findOneAndDelete({ title: title });
+      const result = await Movie.findOneAndDelete({ title: title, serverID: serverID  });
       interaction.reply({
         content: `${title} ${
           !result ? "was not found in" : "was deleted from"
@@ -82,7 +86,7 @@ try {
   },
   getMovie: async function (interaction) {
     const userID = +interaction.user.id
-    const serverID = interaction.guildId
+    const serverID = +interaction.guildId
     try {
       const movies = await Movie.find({serverID: serverID});
       const randomSelection = movies[Math.floor(Math.random() * movies.length)];
@@ -103,8 +107,12 @@ try {
         Runtime: runtime,
         Metascore: metascore,
         imdbRating,
+        Plot: plot,
+        Poster: poster
       } = res.data;
-     const movieEmbed = embeds.GetRandomMovieEmbed(title, userRatings, userLatestReview, interaction, res, year, director, language, runtime, link)
+
+
+     const movieEmbed = embeds.StandardMovieEmbed(title, userLatestReview, interaction, plot, poster, year, director, language, runtime, link)
 
       interaction.reply({ embeds: [movieEmbed] });
     } catch (error) {
@@ -113,20 +121,23 @@ try {
     }
   },
   getFive: async function (interaction) {
+    const serverID = interaction.guildId
     try {
-      const movies = await Movie.find();
+      const movies = await Movie.find({serverID});
       let movieArray = [];
+
+      
+      
 
       Array(5)
         .fill()
         .forEach(async (loop) => {
-          const { title, link } =
-            movies[Math.floor(Math.random() * movies.length)];
-          const res = await axios.get(
-            `https://www.omdbapi.com/?t=${title
-              .split(" ")
-              .join("_")}&apikey=272fc884`
-          );
+          const randomSelection = movies[Math.floor(Math.random() * movies.length)];
+          const { title, link } = randomSelection
+          const userRatings = randomSelection.ratings.filter(el => el.userID === userID)
+          const userLatestReview = userRatings[userRatings.length - 1]
+          
+          const res = await axios.get(`https://www.omdbapi.com/?t=${title.split(" ").join("_")}&apikey=272fc884`);
           const {
             Year: year,
             Director: director,
@@ -134,32 +145,11 @@ try {
             Runtime: runtime,
             Metascore: metascore,
             imdbRating,
+            Poster: poster,
+            Plot: plot
           } = res.data;
-          const movieEmbed = new EmbedBuilder()
-            .setThumbnail(
-              imdbRating >= 8 ? "https://i.imgur.com/pIfdoIW.gif" : null
-            )
-            .setColor(imdbRating >= 8 ? 0xd4af37 : 0x20124d)
-            .setTitle(imdbRating >= 8 ? `🥇${title}🥇` : title || "N/A")
-            .setDescription(res.data.Plot || "N/A")
-            .setImage(res.data.Poster || null)
-            .addFields(
-              { name: "Year", value: year || "N/A", inline: true },
-              { name: "Director", value: director || "N/A", inline: true },
-              { name: "Language", value: language || "N/A", inline: true },
-              { name: "Runtime", value: runtime || "N/A", inline: true },
-              {
-                name: "Metascore",
-                value: metascore >= 8 ? `${metascore}` : metascore || "N/A",
-                inline: true,
-              },
-              {
-                name: "IMDB Rating",
-                value: imdbRating >= 8 ? `${imdbRating}` : imdbRating || "N/A",
-                inline: true,
-              }
-            )
-            .setURL(link || null);
+
+          const movieEmbed = embeds.StandardMovieEmbed(title, userLatestReview, interaction, plot, poster, year, director, language, runtime, link  )
           movieArray.push(movieEmbed);
 
           // interaction.channel.send({ embeds: [movieEmbed] });
@@ -197,7 +187,7 @@ try {
         const userRatings = movie.ratings.filter(el => el.userID === userID)
         const userLatestReview = userRatings[userRatings.length - 1]
         const res = await axios.get(
-          `https://www.omdbapi.com/?t=${movie.title}&apikey=272fc884`
+          `https://www.omdbapi.com/?t=${movie.title}&y=${movie.releaseYear}&apikey=272fc884`
         );
         const {
           Year: year,
@@ -230,10 +220,11 @@ try {
   },
   updateTitle: async function (interaction) {
     const movieQuery = titleCase(interaction.options.getString("title"));
+    const serverID = +interaction.guildId
     const titleUpdate = titleCase(interaction.options.getString("newtitle"));
     try {
       const movie = await Movie.findOneAndUpdate(
-        { title: movieQuery },
+        { title: movieQuery, serverID: serverID },
         { title: titleUpdate }
       );
 
@@ -256,10 +247,11 @@ try {
   updateLink: async function (interaction) {
     const movieQuery = titleCase(interaction.options.getString("title"));
     const newLink = interaction.options.getString("newlink");
+    const serverID = +interaction.guildId;
     if (validURL.isUri(newLink)) {
       try {
         const movies = await Movie.findOneAndUpdate(
-          { title: movieQuery },
+          { title: movieQuery, serverID: serverID },
           { link: newLink }
         );
         if (!movies) {
@@ -292,7 +284,7 @@ try {
 
       } else{
 
-      movie.ratings.push({userID: userID, rating: userRating, review: userReview, watchedOn: new Date()});
+      movie.ratings.push({userID: userID, rating: userRating, review: userReview});
 
       console.log(movie)
 
@@ -308,37 +300,17 @@ try {
         Runtime: runtime,
         Metascore: metascore,
         imdbRating,
+        Plot: plot,
+        Poster: poster
       } = res.data;
       console.log(res.data);
 
-      const movieEmbed = new EmbedBuilder()
-        .setThumbnail(
-          imdbRating >= 8 ? "https://i.imgur.com/pIfdoIW.gif" : null
-        )
-        .setColor(userRating.length >= 4 ? 0xd4af37 : 0x20124d)
-        .setTitle(
-          imdbRating >= 8 ? `🥇${movieQuery}🥇` : movieQuery || "N/A"
-        )
-        .setDescription(res.data.Plot || "N/A")
-        .setImage(res.data.Poster || null)
-        .addFields(
-          { name: "Year", value: year || "N/A", inline: true },
-          { name: "Director", value: director || "N/A", inline: true },
-          { name: "Language", value: language || "N/A", inline: true },
-          { name: "Runtime", value: runtime || "N/A", inline: true },
-          {name: `${interaction.user.username}'s Rating`, value: userRating, inline: true},
-          {name: `${interaction.user.username}'s Review`, value: userReview || "N/A", inline: true}
-        )
-        .setURL(movie.link || null);
+      const userLatestReview = movie.ratings[movie.ratings.length - 1]
+      const movieEmbed = embeds.StandardMovieEmbed(movie.title, userLatestReview, interaction, plot, poster, year, director, language, runtime, movie.link)
 
       interaction.reply({ embeds: [movieEmbed] });
 
       }
-
-      
-
-   
-
       
       
     } catch (error) {

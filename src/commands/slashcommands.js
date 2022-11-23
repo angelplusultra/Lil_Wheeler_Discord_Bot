@@ -9,9 +9,10 @@ const botCommands = {
     .addStringOption(option => option
     .setName('title')
     .setDescription('Pleas enter the title of the movie')
-    .setRequired(true)
-    ).addStringOption(option => option.setName('link').setDescription('Please enter the link to the movie').setRequired(true)
-    ).addStringOption(option => option.setName('rate').setDescription('rate the movie out of 5 stars').addChoices({name: '⭐', value: '⭐' }, {name: '⭐⭐', value: '⭐⭐' }, {name: '⭐⭐⭐', value: '⭐⭐⭐' },{name: '⭐⭐⭐⭐', value: '⭐⭐⭐⭐' }, {name: '⭐⭐⭐⭐⭐', value: '⭐⭐⭐⭐⭐' } )).addStringOption(option => 
+    .setRequired(true))
+    .addStringOption(option => option.setName('year').setDescription('Please enter the release year of the movie').setRequired(true))
+    .addStringOption(option => option.setName('link').setDescription('Please enter the link to the movie').setRequired(true))
+    .addStringOption(option => option.setName('rate').setDescription('rate the movie out of 5 stars').addChoices({name: '⭐', value: '⭐' }, {name: '⭐⭐', value: '⭐⭐' }, {name: '⭐⭐⭐', value: '⭐⭐⭐' },{name: '⭐⭐⭐⭐', value: '⭐⭐⭐⭐' }, {name: '⭐⭐⭐⭐⭐', value: '⭐⭐⭐⭐⭐' } )).addStringOption(option => 
         option.setName('review').setDescription('Please enter a review for the movie')))
         //**DELETE MOVIE**
     .addSubcommand(subcommand => subcommand.setName('deletemovie').setDescription('delete a movie from the database')
