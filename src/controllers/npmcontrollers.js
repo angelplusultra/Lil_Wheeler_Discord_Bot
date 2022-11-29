@@ -56,7 +56,7 @@ const npmControllers = {
             const dowloads = await axios.get(`https://api.npmjs.org/downloads/point/last-year/${keyword}`)
             const metadata = await axios.get(`https://registry.npmjs.org/${keyword}`)
 
-            console.log(dowloads)
+            console.log(dowloads.data)
 
             
         } catch (error) {
