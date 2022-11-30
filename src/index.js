@@ -1,8 +1,5 @@
 // **IMPORTS**
-import {
-  Client,
-  Routes,
-} from "discord.js";
+import { Client, Routes } from "discord.js";
 import * as path from "path";
 import { config } from "dotenv";
 import botControllers from "./controllers/botcontrollers.js";
@@ -11,12 +8,18 @@ import { REST } from "@discordjs/rest";
 import colors from "colors";
 // COMMAND IMPORTS
 import SlashCommands from "./commands/slashcommands.js";
-import {NpmRoutes, MovieEmporiumRoutes} from "./routes/routes.js";
+import { NpmRoutes, MovieEmporiumRoutes } from "./routes/routes.js";
 
 // **CONSOLE.LOG SHORTHAND**
 const log = console.log;
 
-log(`\n Application is in ${process.env.NODE_ENV === "development" ? "development".red : "production".green} mode`);
+log(
+  `\n Application is in ${
+    process.env.NODE_ENV === "development"
+      ? "development".red
+      : "production".green
+  } mode`
+);
 
 // **ENV CONFIG**
 config({ path: path.join(path.resolve() + "/src/config/.env") });
@@ -40,24 +43,31 @@ const rest = new REST({ version: 10 }).setToken(TOKEN);
 // Bot on Succesful Connection
 client.on("ready", () => {
   log(`\n🤖 ${client.user.username} is logged in`.trap.magenta);
-  
 });
 
 // Slash Command Handlers
 client.on("interactionCreate", (interaction) => {
   if (interaction.isChatInputCommand()) {
-       // **MOVIE EMPORIUM ROUTES**
-      if (interaction.commandName === 'movieemporium') {
-          MovieEmporiumRoutes(interaction)
-     }
+    const route = interaction.commandName;
 
-      if(interaction.commandName === 'npmbot'){
-          NpmRoutes(interaction)
-
+    switch (route) {
+      case "movieemporium":
+        MovieEmporiumRoutes(interaction);
+        break;
+      case "npmbot":
+        NpmRoutes(interaction);
+        break;
     }
-    
-  } 
-  
+
+    //   if (interaction.commandName === 'movieemporium') {
+    //       MovieEmporiumRoutes(interaction)
+    //  }
+
+    //   if(interaction.commandName === 'npmbot'){
+    //       NpmRoutes(interaction)
+
+    // }
+  }
 });
 
 // **SLASH COMMANDS REGISTRATION**
@@ -65,7 +75,7 @@ async function main() {
   // **POPULATING AN ARRAY OF SLASH COMMANDS CONVERTED INTO JSON OBJECTS**
   const commands = [
     SlashCommands.LilWheelersMovieEmporium.toJSON(),
-    SlashCommands.NpmBot.toJSON()
+    SlashCommands.NpmBot.toJSON(),
   ];
 
   try {
@@ -78,7 +88,7 @@ async function main() {
           "Test"
         )} Application (/) Commands`.blue
       );
-       await rest.put(Routes.applicationGuildCommands(CLIENT_ID, GUILD_ID), {
+      await rest.put(Routes.applicationGuildCommands(CLIENT_ID, GUILD_ID), {
         body: commands,
       });
     } else {
@@ -96,6 +106,3 @@ async function main() {
 }
 
 main();
-
-
-

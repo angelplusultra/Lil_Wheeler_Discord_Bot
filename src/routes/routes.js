@@ -3,11 +3,26 @@ import botControllers from "../controllers/botcontrollers.js";
 
 
 export function NpmRoutes(interaction){
+    const commandName = interaction.options.getSubcommand();
 
-    if (interaction.options.getSubcommand() === 'searchregistry'){
-        npmControllers.SearchRegistry(interaction);
-         
+    switch(commandName){
+        case 'searchregistry':
+            npmControllers.SearchRegistry(interaction);
+            break;
+        case 'findpackage':
+            npmControllers.FindPackage(interaction);
+            break;
+
     }
+
+    // if (interaction.options.getSubcommand() === 'searchregistry'){
+    //     npmControllers.SearchRegistry(interaction);
+         
+    // }
+    // if (interaction.options.getSubcommand() === 'findpackage'){
+    //     npmControllers.FindPackage(interaction)
+         
+    // }
 
 }
 export async function MovieEmporiumRoutes(interaction){
@@ -24,7 +39,7 @@ export async function MovieEmporiumRoutes(interaction){
           botControllers.deleteMovie(interaction);
       }
       if (commandName === 'getfivemovies'){
-          botControllers.getFive(interaction);
+         botControllers.getFive(interaction);
       }
       if (commandName === 'searchmovie'){
           botControllers.searchMovie(interaction);

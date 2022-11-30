@@ -17,10 +17,11 @@ const npmControllers = {
           let embedsArray = []
           let componentsArray = []
           for(let i = 0; i < 5; i++){
-            console.log(i)
+            console.log(packageArray[0].score)
             const  {name, description, links} = packageArray[i].package
            const button = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId(name).setStyle(ButtonStyle.Primary).setLabel(`Visit ${name} on NPM`))  
            const embed = new EmbedBuilder().setTitle(name || "N/A").setDescription(description || "N/A").setURL(links.npm || null)
+        //    .setFields({name: "Downloads", value: })
            embedsArray.push(embed)
            componentsArray.push(button)
 
@@ -47,6 +48,20 @@ const npmControllers = {
         }
 
 
+    },
+    FindPackage: async function(interaction){
+        const keyword = interaction.options.getString("name")
+
+        try {
+            const dowloads = await axios.get(`https://api.npmjs.org/downloads/point/last-year/${keyword}`)
+            const metadata = await axios.get(`https://registry.npmjs.org/${keyword}`)
+
+            console.log(dowloads)
+
+            
+        } catch (error) {
+            
+        }
     }
 }
 
