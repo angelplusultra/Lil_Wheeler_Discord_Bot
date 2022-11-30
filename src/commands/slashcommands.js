@@ -53,7 +53,14 @@ const botCommands = {
     .addIntegerOption(option => option.setName('year').setDescription('Please enter the release year of the movie').setRequired(true).setMinValue(1888).setMaxValue(currentYear))
     .addStringOption(option => option.setName('rating').setDescription('Choose a rating')
     .addChoices({name: '⭐', value: '⭐' }, {name: '⭐⭐', value: '⭐⭐' }, {name: '⭐⭐⭐', value: '⭐⭐⭐' },{name: '⭐⭐⭐⭐', value: '⭐⭐⭐⭐' }, {name: '⭐⭐⭐⭐⭐', value: '⭐⭐⭐⭐⭐' } ).setRequired(true))
-    .addStringOption(option => option.setName('review').setDescription('Write a review for the film').setMaxLength(1024)))
+    .addStringOption(option => option.setName('review').setDescription('Write a review for the film').setMaxLength(1024))),
+
+    NpmBot: new SlashCommandBuilder()
+    .setName('npmbot')
+    .setDescription('Quickly get info about packages in the NPM registry')
+    .addSubcommand(subcommand => subcommand.setName('searchregistry').setDescription('search registry with a keyword')
+    .addStringOption(option => option.setName('keyword').setDescription('use a keyword to search the registry').setRequired(true)))
+
 
 
 }

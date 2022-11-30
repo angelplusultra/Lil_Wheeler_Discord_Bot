@@ -11,6 +11,7 @@ import { REST } from "@discordjs/rest";
 import colors from "colors";
 // COMMAND IMPORTS
 import SlashCommands from "./commands/slashcommands.js";
+import {NpmRoutes, MovieEmporiumRoutes} from "./routes/routes.js";
 
 // **CONSOLE.LOG SHORTHAND**
 const log = console.log;
@@ -45,53 +46,26 @@ client.on("ready", () => {
 // Slash Command Handlers
 client.on("interactionCreate", (interaction) => {
   if (interaction.isChatInputCommand()) {
+       // **MOVIE EMPORIUM ROUTES**
+      if (interaction.commandName === 'movieemporium') {
+          MovieEmporiumRoutes(interaction)
+     }
 
-    
-      // **MOVIE EMPORIUM ROUTES**
-    if (interaction.commandName === 'movieemporium') {
-        const commandName = interaction.options.getSubcommand()
-      if (commandName === 'getmovie') {
-          botControllers.getMovie(interaction);
-      }
-      if (interaction.options.getSubcommand() === 'addmovie'){
-          botControllers.addMovie(interaction);
-      }
-      if (interaction.options.getSubcommand() === 'deletemovie'){
-          botControllers.deleteMovie(interaction);
-      }
-      if (interaction.options.getSubcommand() === 'getfivemovies'){
-          botControllers.getFive(interaction);
-      }
-      if (interaction.options.getSubcommand() === 'searchmovie'){
-          botControllers.searchMovie(interaction);
-      }
-      if (interaction.options.getSubcommand() === 'updatemovietitle'){
-          botControllers.updateTitle(interaction);
-      }
-      if (interaction.options.getSubcommand() === 'updatemovielink'){
-          botControllers.updateLink(interaction);
-      }
-      if (interaction.options.getSubcommand() === 'reviewmovie') {
-          botControllers.reviewMovie(interaction);
-          
-          
-      }
-  }
-    
-  } else if (interaction.isSelectMenu()){
-      if (interaction.customId === 'food_options'){
+      if(interaction.commandName === 'npmbot'){
+          NpmRoutes(interaction)
 
-      }
+    }
     
-    interaction.reply({content: "it works"})
-  }
+  } 
+  
 });
 
 // **SLASH COMMANDS REGISTRATION**
 async function main() {
   // **POPULATING AN ARRAY OF SLASH COMMANDS CONVERTED INTO JSON OBJECTS**
   const commands = [
-    SlashCommands.LilWheelersMovieEmporium.toJSON()
+    SlashCommands.LilWheelersMovieEmporium.toJSON(),
+    SlashCommands.NpmBot.toJSON()
   ];
 
   try {
@@ -105,7 +79,7 @@ async function main() {
         )} Application (/) Commands`.blue
       );
        await rest.put(Routes.applicationGuildCommands(CLIENT_ID, GUILD_ID), {
-        body: [],
+        body: commands,
       });
     } else {
       // GLOBAL COMMAND REFRESH (ONLY UNCOMMENT WHEN ABOUT TO DEPLOY)

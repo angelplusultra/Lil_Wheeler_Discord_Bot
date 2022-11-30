@@ -150,13 +150,13 @@ try {
             Plot: plot
           } = res.data;
 
-          const movieEmbed = embeds.StandardMovieEmbed(title, userLatestReview, interaction, plot, poster, year, director, language, runtime, link  )
+          const movieEmbed = embeds.StandardMovieEmbed(title, userLatestReview, interaction, plot, poster, year, director, language, runtime, link)
           movieArray.push(movieEmbed);
 
           // interaction.channel.send({ embeds: [movieEmbed] });
 
           if (movieArray.length === 5) {
-            interaction.reply({ embeds: movieArray });
+           await interaction.reply({ embeds: movieArray });
             console.log(movieArray.length)
           } else {
             return;
