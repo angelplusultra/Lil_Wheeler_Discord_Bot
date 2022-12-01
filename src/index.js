@@ -2,7 +2,7 @@
 import { Client, Routes } from "discord.js";
 import * as path from "path";
 import { config } from "dotenv";
-import botControllers from "./controllers/botcontrollers.js";
+import botControllers from "./controllers/moviecontrollers.js";
 import connectDB from "./config/db.js";
 import { REST } from "@discordjs/rest";
 import colors from "colors";
@@ -58,15 +58,6 @@ client.on("interactionCreate", (interaction) => {
         NpmRoutes(interaction);
         break;
     }
-
-    //   if (interaction.commandName === 'movieemporium') {
-    //       MovieEmporiumRoutes(interaction)
-    //  }
-
-    //   if(interaction.commandName === 'npmbot'){
-    //       NpmRoutes(interaction)
-
-    // }
   }
 });
 

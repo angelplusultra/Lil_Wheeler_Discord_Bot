@@ -1,7 +1,8 @@
 import axios from "axios"
 import { ButtonBuilder, EmbedBuilder } from "@discordjs/builders"
-import { ActionRowBuilder, ButtonStyle, ComponentType } from "discord.js"
-
+import { ActionRowBuilder, ButtonStyle, ComponentType, AttachmentBuilder } from "discord.js"
+import {svg2png } from 'svg-png-converter'
+import extract from 'extract-svg-viewbox'
 
 
 
@@ -53,13 +54,36 @@ const npmControllers = {
         const keyword = interaction.options.getString("name")
 
         try {
-            const dowloads = await axios.get(`https://api.npmjs.org/downloads/point/last-year/${keyword}`)
+            // const dowloads = await axios.get(`https://api.npmjs.org/downloads/point/last-year/${keyword}`)
             const metadata = await axios.get(`https://registry.npmjs.org/${keyword}`)
+            const svg = await axios.get(`https://cdn.jsdelivr.net/npm/simple-icons@v7/icons/${keyword}.svg`)
 
-            console.log(dowloads.data)
+            console.log(svg.data)
+
+            const viewBox = extract(svg.data)
+                console.log(viewBox)
+
+               const newSVG = svg.data.replace(viewBox, '0 0 100 100')
+
+                console.log(newSVG)
+
+
+            const outputBuffer = await svg2png({input: svg.data, encoding: 'buffer', format: 'png', quality: 1 })
+            const file = new AttachmentBuilder(outputBuffer)
+            .setName(`${keyword}.png`)
+
+
+            const {name, description, readme} = metadata.data
+            console.log(file)
+            const embed = new EmbedBuilder().setTitle(name).setDescription(description).setThumbnail(`attachment://${keyword}.png` || null)
+            await interaction.reply({embeds: [embed], files: [file] });
+
+                
+
 
             
         } catch (error) {
+            console.log(error)
             
         }
     }

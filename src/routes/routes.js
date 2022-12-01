@@ -1,10 +1,10 @@
 import npmControllers from "../controllers/npmcontrollers.js";
-import botControllers from "../controllers/botcontrollers.js";
+import botControllers from "../controllers/moviecontrollers.js";
 
-export function NpmRoutes(interaction) {
-  const commandName = interaction.options.getSubcommand();
+function NpmRoutes(interaction) {
+  ;
 
-  switch (commandName) {
+  switch (interaction.options.getSubcommand()) {
     case "searchregistry":
       npmControllers.SearchRegistry(interaction);
       break;
@@ -12,41 +12,39 @@ export function NpmRoutes(interaction) {
       npmControllers.FindPackage(interaction);
       break;
   }
-
-  // if (interaction.options.getSubcommand() === 'searchregistry'){
-  //     npmControllers.SearchRegistry(interaction);
-
-  // }
-  // if (interaction.options.getSubcommand() === 'findpackage'){
-  //     npmControllers.FindPackage(interaction)
-
-  // }
 }
-export async function MovieEmporiumRoutes(interaction) {
-  const commandName = interaction.options.getSubcommand();
 
-  if (commandName === "getmovie") {
-    botControllers.getMovie(interaction);
-  }
-  if (commandName === "addmovie") {
-    botControllers.addMovie(interaction);
-  }
-  if (commandName === "deletemovie") {
-    botControllers.deleteMovie(interaction);
-  }
-  if (commandName === "getfivemovies") {
-    botControllers.getFive(interaction);
-  }
-  if (commandName === "searchmovie") {
-    botControllers.searchMovie(interaction);
-  }
-  if (commandName === "updatemovietitle") {
-    botControllers.updateTitle(interaction);
-  }
-  if (commandName === "updatemovielink") {
-    botControllers.updateLink(interaction);
-  }
-  if (commandName === "reviewmovie") {
-    botControllers.reviewMovie(interaction);
+function MovieEmporiumRoutes(interaction) {
+   ;
+
+  switch (interaction.options.getSubcommand()) {
+    case "getmovie":
+        botControllers.getMovie(interaction);
+        break;
+    case "addmovie":
+        botControllers.addMovie(interaction);
+        break;
+    case "deletemovie":
+        botControllers.deleteMovie(interaction);
+        break;
+    case "getfivemovies":
+        botControllers.getFive(interaction);
+        break;
+    case "searchmovie":
+        botControllers.searchMovie(interaction);
+        break;
+    case "updatemovietitle":
+        botControllers.updateTitle(interaction);
+        break;
+    case "updatemovielink":
+        botControllers.updateLink(interaction);
+        break;
+    case "reviewmovie":
+        botControllers.reviewMovie(interaction);
+        break;
+
+    
   }
 }
+
+export { NpmRoutes, MovieEmporiumRoutes }
