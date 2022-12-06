@@ -6,9 +6,15 @@ import botControllers from "./controllers/moviecontrollers.js";
 import connectDB from "./config/db.js";
 import { REST } from "@discordjs/rest";
 import colors from "colors";
+import bcrypt from "bcrypt";
 // COMMAND IMPORTS
 import SlashCommands from "./commands/slashcommands.js";
-import { NpmRoutes, MovieEmporiumRoutes } from "./routes/routes.js";
+import {
+  NpmRoutes,
+  MovieEmporiumRoutes,
+  OpenAIRoutes,
+  ImageBotRoutes
+} from "./routes/routes.js";
 
 // **CONSOLE.LOG SHORTHAND**
 const log = console.log;
@@ -57,6 +63,12 @@ client.on("interactionCreate", (interaction) => {
       case "npmbot":
         NpmRoutes(interaction);
         break;
+      case "openai":
+        OpenAIRoutes(interaction);
+        break;
+      case "imagebot":
+        ImageBotRoutes(interaction)
+        break;
     }
   }
 });
@@ -67,6 +79,8 @@ async function main() {
   const commands = [
     SlashCommands.LilWheelersMovieEmporium.toJSON(),
     SlashCommands.NpmBot.toJSON(),
+    SlashCommands.OpenAI.toJSON(),
+    SlashCommands.ImageBot.toJSON()
   ];
 
   try {

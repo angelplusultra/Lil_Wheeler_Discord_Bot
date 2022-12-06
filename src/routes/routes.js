@@ -1,8 +1,9 @@
 import npmControllers from "../controllers/npmcontrollers.js";
 import botControllers from "../controllers/moviecontrollers.js";
+import openAiControllers from "../controllers/openaicontrollers.js";
+import imageBotControllers from "../controllers/imagebotcontrollers.js";
 
 function NpmRoutes(interaction) {
-  ;
 
   switch (interaction.options.getSubcommand()) {
     case "searchregistry":
@@ -15,7 +16,7 @@ function NpmRoutes(interaction) {
 }
 
 function MovieEmporiumRoutes(interaction) {
-   ;
+   
 
   switch (interaction.options.getSubcommand()) {
     case "getmovie":
@@ -47,4 +48,24 @@ function MovieEmporiumRoutes(interaction) {
   }
 }
 
-export { NpmRoutes, MovieEmporiumRoutes }
+
+function OpenAIRoutes(interaction){
+  switch (interaction.options.getSubcommand()) {
+    case "prompt":
+      openAiControllers.prompt(interaction)
+      
+      break;
+    
+  }
+
+}
+function ImageBotRoutes(interaction){
+  switch (interaction.options.getSubcommand()) {
+    case "image":
+      imageBotControllers.uploadImage(interaction)
+      break;
+    
+  }
+
+}
+export { NpmRoutes, MovieEmporiumRoutes, OpenAIRoutes, ImageBotRoutes }

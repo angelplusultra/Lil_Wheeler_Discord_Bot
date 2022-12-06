@@ -61,7 +61,21 @@ const botCommands = {
     .addSubcommand(subcommand => subcommand.setName('searchregistry').setDescription('search registry with a keyword')
     .addStringOption(option => option.setName('keyword').setDescription('use a keyword to search the registry').setRequired(true)))
     .addSubcommand(subcommand => subcommand.setName('findpackage').setDescription('Get the metadata for 1 package')
-    .addStringOption(option => option.setName('name').setDescription('Please enter the exact name of the package').setRequired(true)))
+    .addStringOption(option => option.setName('name').setDescription('Please enter the exact name of the package').setRequired(true))),
+
+    OpenAI: new SlashCommandBuilder()
+    .setName('openai')
+    .setDescription('prompt openai for a response')
+    .addSubcommand(subcommand => subcommand.setName('prompt').setDescription('prompt the AI')
+    .addStringOption(option => option.setName('prompt').setDescription('Please enter a prompt for the AI').setRequired(true))),
+
+    ImageBot: new SlashCommandBuilder()
+    .setName('imagebot')
+    .setDescription('upload an image to the db')
+    .addSubcommand(subcommand => subcommand.setName('image').setDescription('uploads an image')
+    .addAttachmentOption(option => option.setName('uploadimage').setDescription('upload an image').setRequired(true)))
+    
+
 
 
 
